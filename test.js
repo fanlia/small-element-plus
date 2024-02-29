@@ -8,15 +8,17 @@ const Counter = {
     return { count }
   },
   template: `
-    <button @click="count++">
+    <el-button @click="count++">
       You clicked me {{ count }} times.
-    </button>`
+    </el-button>`
 }
 
 const HomeView = {
   template: `
   <h1>This is an home page</h1>
-  <Counter />
+  <p>
+    <Counter />
+  </p>
   <el-alert title="success alert" type="success" />
   <el-alert title="info alert" type="info" />
   <el-alert title="warning alert" type="warning" />
