@@ -69,6 +69,37 @@ const DefaultAuther = {
   },
 }
 
+const buildAuth = (options) => {
+  const auth = new Auth(options)
+  const user = ref(auth.user)
+  const access_token = ref(auth.access_token)
+  const sync = () => {
+    user.value = auth.user
+    access_token.value = auth.access_token
+  }
+  const checkin = async () => {
+    await auth.checkin()
+    sync()
+  }
+  const logout = async () => {
+    await auth.logout()
+    sync()
+  }
+  const login = async (signData) => {
+    await auth.login(signData)
+    sync()
+  }
+
+  return {
+    login,
+    logout,
+    checkin,
+    user,
+    access_token,
+    options,
+  }
+}
+
 export const useAuth = () => {
   const auth = inject('auth')
   return auth
@@ -126,7 +157,7 @@ export const startMenu = (routes) => {
   return {
     template: `
   <el-menu
-    :default-active="activeIndex"
+    :default-active="$route.path"
     mode="horizontal"
     :ellipsis="false"
     @select="handleSelect"
@@ -142,7 +173,6 @@ export const startMenu = (routes) => {
     setup () {
       const auth = useAuth()
       const router = useRouter()
-      const route = useRoute()
       const handleSelect = async (key, keyPath) => {
         if (key === '/login') {
           await auth.logout()
@@ -151,10 +181,8 @@ export const startMenu = (routes) => {
           path: key,
         })
       }
-      const activeIndex = route.path
       return {
         routes,
-        activeIndex,
         handleSelect,
         user: auth.user,
         appname: auth.options.appname,
@@ -187,17 +215,17 @@ export const startApp = ({
     routes: routes_with_login,
   })
 
-  const auth = new Auth({
+  const auth = buildAuth({
     ...DefaultAuther,
     ...auther,
     appname,
   })
 
   router.beforeEach(async (to, from) => {
-    const user = await auth.checkin()
+    await auth.checkin()
     if (
       // 检查用户是否已登录
-      !user &&
+      !auth.user.value &&
       // ❗️ 避免无限重定向
       to.name !== 'login'
     ) {
@@ -209,12 +237,7 @@ export const startApp = ({
     }
   })
 
-  const DefaultHeader = {
-    template: `<Menu />`,
-    components: {
-      Menu: startMenu(routes),
-    },
-  }
+  const DefaultHeader = startMenu(routes)
 
   const App = {
     template: `
