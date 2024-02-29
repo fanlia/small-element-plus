@@ -143,7 +143,6 @@ export const startMenu = (routes) => {
       const auth = useAuth()
       const router = useRouter()
       const route = useRoute()
-      console.log('menu auth', route.path)
       const handleSelect = async (key, keyPath) => {
         if (key === '/login') {
           await auth.logout()
