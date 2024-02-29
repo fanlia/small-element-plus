@@ -1,5 +1,5 @@
 
-import { createApp, reactive, ref, inject } from 'vue'
+import { createApp, reactive, ref, inject } from 'vue/dist/vue.esm-bundler.js'
 import { createRouter, createWebHashHistory, useRouter, useRoute } from 'vue-router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
