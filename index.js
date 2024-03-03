@@ -222,6 +222,7 @@ export const startApp = ({
   Footer = DefaultFooter,
   Aside,
   routes = [],
+  plugins = [],
   mount = '#app',
   auther,
   appname,
@@ -324,6 +325,10 @@ export const startApp = ({
   app.use(ElementPlus)
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
+  }
+
+  for (const plugin of plugins) {
+    app.use(plugin)
   }
 
   app.provide('auth', auth)
