@@ -199,7 +199,7 @@ export const startApp = ({
   Footer = DefaultFooter,
   Aside,
   routes = [],
-  mount,
+  mount = '#app',
   auther,
   appname,
 }) => {
