@@ -129,14 +129,17 @@ export const useLang = () => {
 
 const LoginView = {
   template: `
-  <div style="display:flex;height:100vh;justify-content:center;align-items:center;flex-flow:column;">
-    <h3>{{appname}}</h3>
+  <div style="display:flex;height:100vh;justify-content:center;align-items:center;flex-flow:column;background-color:#eee;">
+    <div style="background-color:white;padding:0 20px;border-radius:10px;min-width:400px;">
+    <h1 style="text-align:center;">{{appname}}</h1>
+    <el-divider />
     <el-form :model="form" label-width="100px" label-position="left">
       <el-form-item label="Email"><el-input v-model="form.email" type="text" /></el-form-item><el-form-item label="Password"><el-input v-model="form.password" type="password" /></el-form-item><el-form-item label="Remember me"><el-switch v-model="form.autoLogin" /></el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">Login</el-button>
       </el-form-item>
     </el-form>
+    </div>
   </div>
   `,
   setup() {
@@ -229,7 +232,7 @@ export const startApp = ({
   auther,
   appname,
   language,
-  mode = 'vertical',
+  mode = 'horizontal',
 }) => {
   document.body.style.margin="0"
   appname = appname || routes[0]?.name || 'MyApp'
