@@ -231,7 +231,7 @@ export const startApp = ({
   mount = '#app',
   auther,
   appname,
-  language,
+  language = 'zh-cn',
   mode = 'horizontal',
 }) => {
   document.body.style.margin="0"
