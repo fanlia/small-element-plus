@@ -1,9 +1,8 @@
 
 import { createApp, reactive, ref, inject } from 'vue/dist/vue.esm-bundler.js'
 import { createRouter, createWebHashHistory, useRouter, useRoute } from 'vue-router'
-import ElementPlus from 'element-plus'
+import ElementPlus, { ElMessage } from 'element-plus'
 import 'element-plus/dist/index.css'
-
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const KEY = 'access_token'
@@ -129,11 +128,15 @@ const LoginView = {
     })
 
     const onSubmit = async () => {
-      await auth.login(form)
-      const redirect = route.query.redirect || '/'
-      router.push({
-        path: redirect,
-      })
+      try {
+        await auth.login(form)
+        const redirect = route.query.redirect || '/'
+        router.push({
+          path: redirect,
+        })
+      } catch (e) {
+        ElMessage.error(e.message || e)
+      }
     }
 
     return {
