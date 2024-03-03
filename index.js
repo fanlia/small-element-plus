@@ -185,6 +185,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
     @select="handleSelect"
     :style="style"
   >
+    <div :style="logostyle"></div>
     <el-menu-item :index="route.path" v-for="route in routes">{{route.name}}</el-menu-item>
     <div style="flex-grow:1;" />
     <el-sub-menu index="2" v-if="user">
@@ -205,7 +206,9 @@ export const startMenu = (routes, mode = 'horizontal') => {
         })
       }
       const style = mode === 'vertical' ? 'display:flex;flex-direction:column;height:100vh' : ''
+      const logostyle = mode === 'vertical' ? 'height:20px' : ''
       return {
+        logostyle,
         style,
         mode,
         routes,
@@ -226,7 +229,7 @@ export const startApp = ({
   auther,
   appname,
   language,
-  mode = 'horizontal',
+  mode = 'vertical',
 }) => {
   document.body.style.margin="0"
   appname = appname || routes[0]?.name || 'MyApp'
