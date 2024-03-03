@@ -50,6 +50,5 @@ const routes = [
 
 startApp({
   routes,
-  mount: '#app',
 })
 
