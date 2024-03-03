@@ -1,7 +1,7 @@
 
 import { createApp, reactive, ref, inject, computed } from 'vue/dist/vue.esm-bundler.js'
 import { createRouter, createWebHashHistory, useRouter, useRoute } from 'vue-router'
-import ElementPlus, { ElMessage } from 'element-plus'
+import ElementPlus, { ElMessage, ElLoading } from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import en from 'element-plus/dist/locale/en.mjs'
@@ -136,7 +136,7 @@ const LoginView = {
     <el-form :model="form" label-width="100px" label-position="left">
       <el-form-item label="Email"><el-input v-model="form.email" type="text" /></el-form-item><el-form-item label="Password"><el-input v-model="form.password" type="password" /></el-form-item><el-form-item label="Remember me"><el-switch v-model="form.autoLogin" /></el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">Login</el-button>
+        <el-button type="primary" @click="onSubmit" :loading="loading">Login</el-button>
       </el-form-item>
     </el-form>
     </div>
@@ -146,6 +146,7 @@ const LoginView = {
     const auth = useAuth()
     const router = useRouter()
     const route = useRoute()
+    const loading = ref(false)
 
     const form = reactive({
       email: '',
@@ -154,6 +155,7 @@ const LoginView = {
     })
 
     const onSubmit = async () => {
+      loading.value = true
       try {
         await auth.login(form)
         const redirect = route.query.redirect || '/'
@@ -163,9 +165,11 @@ const LoginView = {
       } catch (e) {
         ElMessage.error(e.message || e)
       }
+      loading.value = false
     }
 
     return {
+      loading,
       form,
       onSubmit,
       appname: auth.options.appname,
@@ -182,7 +186,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
   return {
     template: `
   <el-menu
-    :default-active="$route.path"
+    :default-active="activeIndex"
     :mode="mode"
     :ellipsis="false"
     @select="handleSelect"
@@ -199,7 +203,11 @@ export const startMenu = (routes, mode = 'horizontal') => {
     `,
     setup () {
       const auth = useAuth()
+      const route = useRoute()
       const router = useRouter()
+      const activeIndex = computed(() => {
+        return auth.user.value ? route.path : ''
+      })
       const handleSelect = async (key, keyPath) => {
         if (key === '/login') {
           await auth.logout()
@@ -215,6 +223,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
         style,
         mode,
         routes,
+        activeIndex,
         handleSelect,
         user: auth.user,
         appname: auth.options.appname,
@@ -260,17 +269,24 @@ export const startApp = ({
   const lang = buildLang(language)
 
   router.beforeEach(async (to, from) => {
-    await auth.checkin()
     if (
       // 检查用户是否已登录
       !auth.user.value &&
       // ❗️ 避免无限重定向
       to.name !== 'login'
     ) {
-      // 将用户重定向到登录页面
-      return {
-        name: 'login',
-        query: { redirect: to.fullPath },
+      const loadingInstance = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+      })
+      await auth.checkin()
+      loadingInstance.close()
+      if (!auth.user.value) {
+        // 将用户重定向到登录页面
+        return {
+          name: 'login',
+          query: { redirect: to.fullPath },
+        }
       }
     }
   })
