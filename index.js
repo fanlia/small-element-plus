@@ -201,8 +201,9 @@ export const startApp = ({
   routes = [],
   mount,
   auther,
+  appname,
 }) => {
-  const appname = routes[0].name
+  appname = appname || routes[0]?.name || 'MyApp'
 
   const routes_with_login = [
     {
