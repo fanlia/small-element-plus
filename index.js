@@ -174,19 +174,16 @@ const DefaultFooter = {
   template: `&nbsp;`,
 }
 
-const DefaultAside = {
-  template: `&nbsp;`,
-}
-
-export const startMenu = (routes) => {
+export const startMenu = (routes, mode = 'horizontal') => {
 
   return {
     template: `
   <el-menu
     :default-active="$route.path"
-    mode="horizontal"
+    :mode="mode"
     :ellipsis="false"
     @select="handleSelect"
+    :style="style"
   >
     <el-menu-item :index="route.path" v-for="route in routes">{{route.name}}</el-menu-item>
     <div style="flex-grow:1;" />
@@ -207,7 +204,10 @@ export const startMenu = (routes) => {
           path: key,
         })
       }
+      const style = mode === 'vertical' ? 'display:flex;flex-direction:column;height:100vh' : ''
       return {
+        style,
+        mode,
         routes,
         handleSelect,
         user: auth.user,
@@ -220,14 +220,15 @@ export const startMenu = (routes) => {
 export const startApp = ({
   Header,
   Footer = DefaultFooter,
-  Aside,
   routes = [],
   plugins = [],
   mount = '#app',
   auther,
   appname,
   language,
+  mode = 'horizontal',
 }) => {
+  document.body.style.margin="0"
   appname = appname || routes[0]?.name || 'MyApp'
 
   const routes_with_login = [
@@ -268,7 +269,7 @@ export const startApp = ({
     }
   })
 
-  const DefaultHeader = startMenu(routes)
+  const DefaultHeader = startMenu(routes, mode)
 
   const App = {
     template: `
@@ -276,14 +277,11 @@ export const startApp = ({
     <template v-if="$route.name === 'login'">
         <RouterView />
     </template>
-    <el-container v-else-if="hasAside">
-      <el-aside width="200px">
-        <Aside />
+    <el-container v-else-if="mode==='vertical'">
+      <el-aside width="auto">
+        <Header />
       </el-aside>
       <el-container>
-        <el-header>
-          <Header />
-        </el-header>
         <el-main>
           <RouterView />
         </el-main>
@@ -306,16 +304,14 @@ export const startApp = ({
     </el-config-provider>
     `,
     setup () {
-      const hasAside = !!Aside
       return {
         locale: lang.locale,
-        hasAside
+        mode,
       }
     },
     components: {
       Header: Header || DefaultHeader,
       Footer,
-      Aside: Aside || DefaultAside,
     },
   }
 
