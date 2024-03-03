@@ -23,6 +23,9 @@ const HomeView = {
   <el-alert title="info alert" type="info" />
   <el-alert title="warning alert" type="warning" />
   <el-alert title="error alert" type="error" />
+  <p>
+    <el-pagination :total="100" />
+  </p>
   `,
   components: {
     Counter,

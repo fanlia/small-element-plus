@@ -1,8 +1,11 @@
 
-import { createApp, reactive, ref, inject } from 'vue/dist/vue.esm-bundler.js'
+import { createApp, reactive, ref, inject, computed } from 'vue/dist/vue.esm-bundler.js'
 import { createRouter, createWebHashHistory, useRouter, useRoute } from 'vue-router'
 import ElementPlus, { ElMessage } from 'element-plus'
 import 'element-plus/dist/index.css'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import en from 'element-plus/dist/locale/en.mjs'
+
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const KEY = 'access_token'
@@ -104,6 +107,26 @@ export const useAuth = () => {
   return auth
 }
 
+const buildLang = (name = 'en') => {
+  const language = ref(name)
+  const locale = computed(() => (language.value === 'zh-cn' ? zhCn : en))
+
+  const toggle = () => {
+    language.value = language.value === 'zh-cn' ? 'en' : 'zh-cn'
+  }
+
+  return {
+    language,
+    locale,
+    toggle,
+  }
+}
+
+export const useLang = () => {
+  const lang = inject('lang')
+  return lang
+}
+
 const LoginView = {
   template: `
   <div style="display:flex;height:100vh;justify-content:center;align-items:center;flex-flow:column;">
@@ -202,6 +225,7 @@ export const startApp = ({
   mount = '#app',
   auther,
   appname,
+  language,
 }) => {
   appname = appname || routes[0]?.name || 'MyApp'
 
@@ -225,6 +249,8 @@ export const startApp = ({
     appname,
   })
 
+  const lang = buildLang(language)
+
   router.beforeEach(async (to, from) => {
     await auth.checkin()
     if (
@@ -245,6 +271,7 @@ export const startApp = ({
 
   const App = {
     template: `
+    <el-config-provider :locale="locale">
     <template v-if="$route.name === 'login'">
         <RouterView />
     </template>
@@ -275,10 +302,12 @@ export const startApp = ({
         <Footer />
       </el-footer>
     </el-container>
+    </el-config-provider>
     `,
     setup () {
       const hasAside = !!Aside
       return {
+        locale: lang.locale,
         hasAside
       }
     },
@@ -298,6 +327,7 @@ export const startApp = ({
   }
 
   app.provide('auth', auth)
+  app.provide('lang', lang)
 
   app.mount(mount)
 
