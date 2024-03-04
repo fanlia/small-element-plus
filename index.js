@@ -205,7 +205,17 @@ const DefaultNotFound = {
   `,
 }
 
+const getRouteMap = (routes = []) => {
+  return routes.reduce((m, d) => ({
+    ...m,
+    [d.name]: d.path,
+    ...getRouteMap(d.children),
+  }), {})
+}
+
 export const startMenu = (routes, mode = 'horizontal') => {
+
+  const routeMap = getRouteMap(routes)
 
   return {
     template: `
@@ -230,7 +240,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
       const route = useRoute()
       const router = useRouter()
       const activeIndex = computed(() => {
-        return auth.user.value ? route.path : ''
+        return auth.user.value ? routeMap[route.name] : ''
       })
       const handleSelect = async (key, keyPath) => {
         if (key === '/login') {
