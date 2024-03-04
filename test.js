@@ -35,6 +35,25 @@ const AboutView = {
   `
 }
 
+const TestView = {
+  template: `
+    <h2>Test</h2>
+    <router-view></router-view>
+  `,
+}
+
+const Test1View = {
+  template: `
+  <h1>This is an test/1 page</h1>
+  `
+}
+
+const Test2View = {
+  template: `
+  <h1>This is an test/2 page</h1>
+  `
+}
+
 const routes = [
   {
     path: '/',
@@ -45,6 +64,23 @@ const routes = [
     path: '/about',
     name: 'About',
     component: AboutView
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: TestView,
+    children: [
+      {
+        path: '/test/test1',
+        name: 'Test 1',
+        component: Test1View,
+      },
+      {
+        path: '/test/test2',
+        name: 'Test 2',
+        component: Test2View,
+      },
+    ],
   },
 ]
 

@@ -181,6 +181,30 @@ const DefaultFooter = {
   template: `&nbsp;`,
 }
 
+const SmallMenuItem = {
+  template: `
+    <template v-for="route in routes">
+      <el-sub-menu :index="route.path" v-if="Array.isArray(route.children) && route.children.length > 0">
+        <template #title>{{route.name}}</template>
+        <SmallMenuItem :routes="route.children" />
+      </el-sub-menu>
+      <el-menu-item :index="route.path" v-else>{{route.name}}</el-menu-item>
+    </template>
+  `,
+  props: {
+    routes: {
+      type: Array,
+      default: () => [],
+    },
+  },
+}
+
+const DefaultNotFound = {
+  template: `
+  <h1>Not Found</h1>
+  `,
+}
+
 export const startMenu = (routes, mode = 'horizontal') => {
 
   return {
@@ -193,7 +217,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
     :style="style"
   >
     <div :style="logostyle"></div>
-    <el-menu-item :index="route.path" v-for="route in routes">{{route.name}}</el-menu-item>
+    <SmallMenuItem :routes="routes" />
     <div style="flex-grow:1;" />
     <el-sub-menu index="2" v-if="user">
       <template #title>{{user.username}}</template>
@@ -235,6 +259,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
 export const startApp = ({
   Header,
   Footer = DefaultFooter,
+  NotFound = DefaultNotFound,
   routes = [],
   plugins = [],
   mount = '#app',
@@ -253,6 +278,11 @@ export const startApp = ({
       component: LoginView,
     },
     ...routes,
+    {
+      path: '/:404(.*)',
+      name: 'notFound',
+      component: NotFound,
+    },
   ]
 
   const router = createRouter({
@@ -351,6 +381,7 @@ export const startApp = ({
 
   app.provide('auth', auth)
   app.provide('lang', lang)
+  app.component('SmallMenuItem', SmallMenuItem)
 
   app.mount(mount)
 
