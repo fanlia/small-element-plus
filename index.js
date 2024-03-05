@@ -107,9 +107,27 @@ export const useAuth = () => {
   return auth
 }
 
+const DefaultI18n = {
+  en: {
+    'small.login.email': 'Email:',
+    'small.login.password': 'Password:',
+    'small.login.remember_me': 'Remember me:',
+    'small.login.login': 'Login',
+    'small.login.logout': 'Logout',
+  },
+  'zh-cn': {
+    'small.login.email': '邮箱:',
+    'small.login.password': '密码:',
+    'small.login.remember_me': '记住我:',
+    'small.login.login': '登录',
+    'small.login.logout': '登出',
+  },
+}
+
 const buildLang = (name = 'en') => {
   const language = ref(name)
   const locale = computed(() => (language.value === 'zh-cn' ? zhCn : en))
+  const smallt = computed(() => (key) => DefaultI18n[language.value][key] || key)
 
   const toggle = () => {
     language.value = language.value === 'zh-cn' ? 'en' : 'zh-cn'
@@ -118,6 +136,7 @@ const buildLang = (name = 'en') => {
   return {
     language,
     locale,
+    smallt,
     toggle,
   }
 }
@@ -133,16 +152,24 @@ const LoginView = {
     <div style="background-color:white;padding:0 20px;border-radius:10px;min-width:400px;">
     <h1 style="text-align:center;">{{appname}}</h1>
     <el-divider />
-    <el-form :model="form" label-width="100px" label-position="left">
-      <el-form-item label="Email"><el-input v-model="form.email" type="text" /></el-form-item><el-form-item label="Password"><el-input v-model="form.password" type="password" /></el-form-item><el-form-item label="Remember me"><el-switch v-model="form.autoLogin" /></el-form-item>
+    <el-form :model="form" label-width="auto" label-position="left">
+      <el-form-item :label="smallt('small.login.email')">
+        <el-input v-model="form.email" type="text" />
+      </el-form-item>
+      <el-form-item :label="smallt('small.login.password')">
+        <el-input v-model="form.password" type="password" />
+      </el-form-item>
+      <el-form-item :label="smallt('small.login.remember_me')">
+        <el-switch v-model="form.autoLogin" /></el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit" :loading="loading">Login</el-button>
+        <el-button style="width:100%" type="primary" @click="onSubmit" :loading="loading">{{smallt('small.login.login')}}</el-button>
       </el-form-item>
     </el-form>
     </div>
   </div>
   `,
   setup() {
+    const { smallt } = useLang()
     const auth = useAuth()
     const router = useRouter()
     const route = useRoute()
@@ -173,6 +200,7 @@ const LoginView = {
       form,
       onSubmit,
       appname: auth.options.appname,
+      smallt,
     }
   },
 }
@@ -231,11 +259,12 @@ export const startMenu = (routes, mode = 'horizontal') => {
     <div style="flex-grow:1;" />
     <el-sub-menu index="2" v-if="user">
       <template #title>{{user.username}}</template>
-      <el-menu-item index="/login">Logout</el-menu-item>
+      <el-menu-item index="/login">{{smallt('small.login.logout')}}</el-menu-item>
     </el-sub-menu>
   </el-menu>
     `,
     setup () {
+      const { smallt } = useLang()
       const auth = useAuth()
       const route = useRoute()
       const router = useRouter()
@@ -261,6 +290,7 @@ export const startMenu = (routes, mode = 'horizontal') => {
         handleSelect,
         user: auth.user,
         appname: auth.options.appname,
+        smallt,
       }
     },
   }
@@ -317,7 +347,6 @@ export const startApp = ({
     ) {
       const loadingInstance = ElLoading.service({
         lock: true,
-        text: 'Loading',
       })
       await auth.checkin()
       loadingInstance.close()
