@@ -148,7 +148,8 @@ export const CRUDView = {
 
     const handleUpdate = (row) => {
       console.log('update', row)
-      data.value.push({ ...row })
+      const index = data.value.findIndex(d => d._id === row._id)
+      data.value.splice(index, 1, { ...row })
     }
 
     const handleDelete = (row) => {
