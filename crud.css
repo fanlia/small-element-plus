@@ -1,0 +1,4 @@
+
+.el-scrollbar .cm-scroller {
+  overflow-x: unset !important;
+}

@@ -4,6 +4,7 @@ import { ref, reactive, watch, toRaw } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import CodeMirror from 'vue-codemirror6'
+import './crud.css'
 
 const SmallTableColumn = {
   template: `
