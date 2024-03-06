@@ -1,4 +1,5 @@
 import { startApp } from './index.js'
+import { CRUDView } from './crud-test.js'
 
 import { ref } from 'vue'
 
@@ -64,6 +65,11 @@ const routes = [
     path: '/about',
     name: 'About',
     component: AboutView
+  },
+  {
+    path: '/crud',
+    name: 'CRUD',
+    component: CRUDView,
   },
   {
     path: '/test',
