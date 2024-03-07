@@ -1,6 +1,6 @@
 {
   "name": "small-element-plus",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "small startup for element plus",
   "main": "index.js",
   "type": "module",
