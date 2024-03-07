@@ -418,10 +418,10 @@ export const CRUD = {
     const dialogVisibleEdit = ref(false)
     const dialogVisibleRead = ref(false)
 
-    const search = async () => {
+    const search = async (query) => {
       loading.value = true
       try {
-        const res = await processSearch()
+        const res = await processSearch(query)
         console.log(res)
         pageData.value = res
       } catch (e) {
