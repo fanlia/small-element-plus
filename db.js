@@ -43,8 +43,16 @@ export class Database {
     return res[`${this.name}_create`]
   }
 
+  ensureId (_id) {
+    if (!_id) {
+      throw new Error('_id required')
+    }
+  }
+
   async update (row) {
+    this.ensureId(row._id)
     const { _id, ...data } = row
+
     const body = {
       query: `
       mutation (
@@ -56,7 +64,7 @@ export class Database {
       `,
       variables: {
         filter: {
-          _id: row._id,
+          _id,
         },
         data,
       },
@@ -67,6 +75,8 @@ export class Database {
   }
 
   async delete (row) {
+    this.ensureId(row._id)
+
     const body = {
       query: `
       mutation (
