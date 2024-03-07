@@ -14,10 +14,17 @@ import { html } from '@codemirror/lang-html';
 export const CRUDView = {
   template: `
   <h1>This is an crud page</h1>
+  <el-button type="primary" size="small" @click="dialogVisibleCreate = true">New</el-button>
   <SmallSearch :db="db" :data="data" :total="total" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @search="handleSearch" />
-  <SmallEdit :db="db" :item="item" @update="handleUpdate" />
-  <SmallRead :db="db" :item="item" />
-  <SmallCreate :db="db" @create="handleCreate" />
+  <el-dialog v-model="dialogVisibleEdit">
+    <SmallEdit :db="db" :item="item" @update="handleUpdate" />
+  </el-dialog>
+  <el-dialog v-model="dialogVisibleRead">
+    <SmallRead :db="db" :item="item" />
+  </el-dialog>
+  <el-dialog v-model="dialogVisibleCreate">
+    <SmallCreate :db="db" @create="handleCreate" />
+  </el-dialog>
   `,
   components: {
     SmallSearch,
@@ -132,9 +139,14 @@ export const CRUDView = {
 
     const item = ref(null)
 
+    const dialogVisibleCreate = ref(false)
+    const dialogVisibleEdit = ref(false)
+    const dialogVisibleRead = ref(false)
+
     const handleDetail = (row) => {
       console.log('detail', row)
       item.value = row
+      dialogVisibleRead.value = true
     }
 
     const handleCreate = (row) => {
@@ -145,6 +157,7 @@ export const CRUDView = {
     const handleEdit = (row) => {
       console.log('edit', row)
       item.value = row
+      dialogVisibleEdit.value = true
     }
 
     const handleUpdate = (row) => {
@@ -174,6 +187,10 @@ export const CRUDView = {
       handleUpdate,
       handleDelete,
       handleSearch,
+
+      dialogVisibleCreate,
+      dialogVisibleRead,
+      dialogVisibleEdit,
     }
   },
 }
