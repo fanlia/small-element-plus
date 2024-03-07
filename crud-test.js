@@ -51,7 +51,6 @@ export const CRUDView = {
             data: {
               lang: html(),
               basic: true,
-              style: "width:100%;",
             },
           },
         },
