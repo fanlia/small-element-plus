@@ -1,5 +1,6 @@
 import { startApp } from './index.js'
 import { CRUDView } from './crud-test.js'
+import { CRUDMongoDBView } from './crud-test-mongodb.js'
 
 import { ref } from 'vue'
 
@@ -70,6 +71,7 @@ const routes = [
     path: '/crud',
     name: 'CRUD',
     component: CRUDView,
+    // component: CRUDMongoDBView,
   },
   {
     path: '/test',

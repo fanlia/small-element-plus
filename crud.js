@@ -303,7 +303,7 @@ const SmallFormItem = {
       </el-select>
     </el-form-item>
     <el-form-item :label="label || name" v-else>
-      <el-input v-model="form[name]" />
+      <el-input v-model="form[name]" :disabled="name === '_id'" />
     </el-form-item>
   `,
   props: ['form', 'name', 'type', 'label'],
@@ -317,7 +317,7 @@ const SmallFormItem = {
 export const SmallCreate = {
   template: `
   <el-form :model="form" label-width="auto">
-    <SmallFormItem :form="form" :="field" v-for="field in db.fields" />
+    <SmallFormItem :form="form" :="field" v-for="field in fields" />
     <el-form-item>
       <el-button type="primary" @click="onSubmit">Create</el-button>
     </el-form-item>
@@ -329,7 +329,8 @@ export const SmallCreate = {
     SmallFormItem,
   },
   setup ({ db }, { emit }) {
-    const defaults = getDefaults(db.fields)
+    const fields = db.fields.filter(d => d.name !== '_id')
+    const defaults = getDefaults(fields)
     const form = reactive(defaults)
 
     const onSubmit = () => {
@@ -340,6 +341,7 @@ export const SmallCreate = {
     return {
       form,
       onSubmit,
+      fields,
     }
   },
 }

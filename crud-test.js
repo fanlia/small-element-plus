@@ -126,7 +126,7 @@ export const CRUDView = {
 
     const processCreate = (row) => {
       console.log('create', row)
-      data.push({ ...row })
+      data.push({ ...row, _id: `_id${data.length + 1}` })
     }
 
     const processUpdate = (row) => {
