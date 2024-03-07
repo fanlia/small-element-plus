@@ -1,12 +1,9 @@
 
 import {
-  SmallSearch,
-  SmallCreate,
-  SmallRead,
-  SmallEdit,
+  CRUD,
 } from './crud.js'
 
-import { ref, computed, } from 'vue'
+import { ref } from 'vue'
 
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
@@ -14,23 +11,16 @@ import { html } from '@codemirror/lang-html';
 export const CRUDView = {
   template: `
   <h1>This is an crud page</h1>
-  <el-button type="primary" size="small" @click="dialogVisibleCreate = true">New</el-button>
-  <SmallSearch :db="db" :data="data" :total="total" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @search="handleSearch" />
-  <el-dialog v-model="dialogVisibleEdit">
-    <SmallEdit :db="db" :item="item" @update="handleUpdate" />
-  </el-dialog>
-  <el-dialog v-model="dialogVisibleRead">
-    <SmallRead :db="db" :item="item" />
-  </el-dialog>
-  <el-dialog v-model="dialogVisibleCreate">
-    <SmallCreate :db="db" @create="handleCreate" />
-  </el-dialog>
+  <CRUD
+    :db="db"
+    :processSearch="processSearch"
+    :processCreate="processCreate"
+    :processUpdate="processUpdate"
+    :processDelete="processDelete"
+  />
   `,
   components: {
-    SmallSearch,
-    SmallCreate,
-    SmallRead,
-    SmallEdit,
+    CRUD,
   },
   setup () {
     const db = {
@@ -108,7 +98,7 @@ export const CRUDView = {
       ],
     }
 
-    const data = ref([
+    const data = [
       {
         _id: '_id1',
         string: 'just a normal string',
@@ -133,66 +123,39 @@ export const CRUDView = {
         datetime: new Date(),
         enum: 'yes',
       },
-    ])
+    ]
 
-    const total = ref(100)
-
-    const item = ref(null)
-
-    const dialogVisibleCreate = ref(false)
-    const dialogVisibleEdit = ref(false)
-    const dialogVisibleRead = ref(false)
-
-    const handleDetail = (row) => {
-      console.log('detail', row)
-      item.value = row
-      dialogVisibleRead.value = true
-    }
-
-    const handleCreate = (row) => {
+    const processCreate = (row) => {
       console.log('create', row)
-      data.value.push({ ...row })
-      dialogVisibleCreate.value = false
+      data.push({ ...row })
     }
 
-    const handleEdit = (row) => {
-      console.log('edit', row)
-      item.value = row
-      dialogVisibleEdit.value = true
-    }
-
-    const handleUpdate = (row) => {
+    const processUpdate = (row) => {
       console.log('update', row)
-      const index = data.value.findIndex(d => d._id === row._id)
-      data.value.splice(index, 1, { ...row })
-      dialogVisibleEdit.value = false
+      const index = data.findIndex(d => d._id === row._id)
+      console.log({index})
+      data.splice(index, 1, { ...row })
     }
 
-    const handleDelete = (row) => {
+    const processDelete = (row) => {
       console.log('delete', row)
-      data.value = data.value.filter(d => d._id !== row._id)
+      data = data.filter(d => d._id !== row._id)
     }
 
-    const handleSearch = (query) => {
+    const processSearch = (query) => {
       console.log('search', query)
-      total.value = 20
+      return {
+        data: [...data],
+        count: data.length * 10,
+      }
     }
 
     return {
       db,
-      data,
-      total,
-      item,
-      handleDetail,
-      handleCreate,
-      handleEdit,
-      handleUpdate,
-      handleDelete,
-      handleSearch,
-
-      dialogVisibleCreate,
-      dialogVisibleRead,
-      dialogVisibleEdit,
+      processSearch,
+      processCreate,
+      processUpdate,
+      processDelete,
     }
   },
 }

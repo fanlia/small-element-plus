@@ -1,5 +1,5 @@
 
-import { ref, reactive, watch, toRaw } from 'vue'
+import { ref, reactive, watch, toRaw, onMounted } from 'vue'
 
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -49,7 +49,7 @@ const SmallTableColumn = {
 export const SmallSearch = {
   template: `
   <div>
-  <el-table :data="data">
+  <el-table :data="pageData.data">
     <SmallTableColumn :="field" v-for="field in db.fields" />
     <el-table-column fixed="right" label="Operations" width="200px">
       <template #default="scope">
@@ -66,15 +66,16 @@ export const SmallSearch = {
     </el-table-column>
 
   </el-table>
-  <el-pagination :total="total" @change='handlePage' style="margin-top:1em;" v-if="total" />
+  <el-pagination :total="pageData.count" @change='handlePage' style="margin-top:1em;" v-if="pageData.count" />
   </div>
   `,
-  props: ['db', 'data', 'total'],
+  props: ['db', 'pageData'],
   emits: ['detail', 'edit', 'delete', 'search'],
   components: {
     SmallTableColumn,
   },
   setup (props, { emit }) {
+
     const handleDetail = (row) => {
       emit('detail', row)
     }
@@ -366,3 +367,136 @@ export const SmallRead = {
     }
   },
 }
+
+const Nope = () => {}
+
+export const CRUD = {
+  template: `
+  <el-button type="primary" size="small" @click="dialogVisibleCreate = true">New</el-button>
+  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @search="handleSearch" v-loading="loading" />
+  <el-dialog v-model="dialogVisibleEdit">
+    <SmallEdit :db="db" :item="item" @update="handleUpdate" />
+  </el-dialog>
+  <el-dialog v-model="dialogVisibleRead">
+    <SmallRead :db="db" :item="item" />
+  </el-dialog>
+  <el-dialog v-model="dialogVisibleCreate">
+    <SmallCreate :db="db" @create="handleCreate" />
+  </el-dialog>
+  `,
+  components: {
+    SmallSearch,
+    SmallCreate,
+    SmallRead,
+    SmallEdit,
+  },
+  props: [
+    'db',
+    'processSearch',
+    'processCreate',
+    'processUpdate',
+    'processDelete',
+  ],
+  setup ({
+    db,
+    processSearch = Nope,
+    processCreate = Nope,
+    processUpdate = Nope,
+    processDelete = Nope,
+  }) {
+
+    const loading = ref(true)
+
+    const pageData = ref({
+      data: [],
+      count: 0,
+    })
+
+    const item = ref(null)
+
+    const dialogVisibleCreate = ref(false)
+    const dialogVisibleEdit = ref(false)
+    const dialogVisibleRead = ref(false)
+
+    const search = async () => {
+      loading.value = true
+      try {
+        const res = await processSearch()
+        console.log(res)
+        pageData.value = res
+      } catch (e) {
+        console.log('search error', e)
+        // ignore
+      }
+      loading.value = false
+    }
+
+    onMounted(async () => {
+      await search()
+    })
+
+    const handleDetail = (row) => {
+      item.value = row
+      dialogVisibleRead.value = true
+    }
+
+    const handleCreate = async (row) => {
+      try {
+        await processCreate({ ...row })
+      } catch (e) {
+        console.log('create error', e)
+        // ignore
+      }
+      search()
+      dialogVisibleCreate.value = false
+    }
+
+    const handleEdit = (row) => {
+      item.value = row
+      dialogVisibleEdit.value = true
+    }
+
+    const handleUpdate = async (row) => {
+      try {
+        await processUpdate({ ...row })
+      } catch (e) {
+        console.log('update error', e)
+        // ignore
+      }
+      search()
+      dialogVisibleEdit.value = false
+    }
+
+    const handleDelete = async (row) => {
+      try {
+        await processDelete({ ...row })
+      } catch (e) {
+        console.log('delete error', e)
+        // ignore
+      }
+      search()
+    }
+
+    const handleSearch = async (query) => {
+      search(query)
+    }
+
+    return {
+      loading,
+      db,
+      pageData,
+      item,
+      handleDetail,
+      handleCreate,
+      handleEdit,
+      handleUpdate,
+      handleDelete,
+      handleSearch,
+
+      dialogVisibleCreate,
+      dialogVisibleRead,
+      dialogVisibleEdit,
+    }
+  },
+}
+
