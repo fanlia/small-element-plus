@@ -117,9 +117,15 @@ const SmallUpload = {
       :limit="limit"
       :before-upload="beforeUpload"
       :on-success='handleUploadSuccess'
+      :on-preview="handlePictureCardPreview"
     >
       <el-icon><Plus /></el-icon>
     </el-upload>
+    <el-dialog v-model="dialogVisible">
+      <div style="text-align:center;">
+        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+      </div>
+    </el-dialog>
   `,
 
   props: {
@@ -149,11 +155,22 @@ const SmallUpload = {
       emit('update:modelValue', files[0].url)
     }
 
+    const dialogImageUrl = ref('')
+    const dialogVisible = ref(false)
+
+    const handlePictureCardPreview = (uploadFile) => {
+      dialogImageUrl.value = uploadFile.url
+      dialogVisible.value = true
+    }
+
     return {
       fileList,
       limit,
       beforeUpload,
       handleUploadSuccess,
+      handlePictureCardPreview,
+      dialogImageUrl,
+      dialogVisible,
     }
   },
 }
