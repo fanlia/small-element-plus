@@ -152,6 +152,7 @@ export const CRUDView = {
     const handleCreate = (row) => {
       console.log('create', row)
       data.value.push({ ...row })
+      dialogVisibleCreate.value = false
     }
 
     const handleEdit = (row) => {
@@ -164,6 +165,7 @@ export const CRUDView = {
       console.log('update', row)
       const index = data.value.findIndex(d => d._id === row._id)
       data.value.splice(index, 1, { ...row })
+      dialogVisibleEdit.value = false
     }
 
     const handleDelete = (row) => {
