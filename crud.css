@@ -2,3 +2,11 @@
 .el-scrollbar .cm-scroller {
   overflow-x: unset !important;
 }
+
+.small-filter-domain .el-select {
+  --el-select-width: 220px;
+}
+
+.small-filter-domain .el-input {
+  --el-input-width: 220px;
+}

@@ -46,6 +46,84 @@ const SmallTableColumn = {
   },
 }
 
+export const SmallFilter = {
+  template: `
+  <el-form :model="form" :inline="true">
+    <div v-for="domain in form.domains" :key="domain.key" class="small-filter-domain">
+      <el-form-item>
+        <el-select v-model="domain.name">
+          <el-option :value="field.name" :label="field.label || field.name" v-for="field in db.fields" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="domain.operator">
+          <el-option value="=" label="=" />
+          <el-option value=">=" label=">=" />
+          <el-option value=">" label=">" />
+          <el-option value="<=" label="<=" />
+          <el-option value="<" label="<" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="domain.value" />
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="onRemove(domain)">
+          <el-icon><Minus /></el-icon>
+        </el-button>
+      </el-form-item>
+    </div>
+    <el-form-item>
+      <el-button @click="onAdd">
+        <el-icon><Plus /></el-icon>
+      </el-button>
+      <el-button type="primary" @click="onSubmit">Search</el-button>
+    </el-form-item>
+  </el-form>
+  `,
+  props: ['db'],
+  emits: ['filter'],
+  components: {
+  },
+  setup ({ db }, { emit }) {
+
+    const newDomain = () => ({
+      key: Date.now(),
+      name: '',
+      operator: '=',
+      value: '',
+    })
+
+    const form = reactive({
+      domains: [
+        newDomain(),
+      ],
+    })
+
+    const onAdd = () => {
+      form.domains.push(newDomain())
+    }
+
+    const onRemove = (domain) => {
+      const index = form.domains.findIndex(d => d.key === domain.key)
+      console.log({index})
+      form.domains.splice(index, 1)
+    }
+
+    const onSubmit = () => {
+      const item = toRaw(form.domains.filter(d => d.name))
+      emit('filter', item)
+    }
+
+    return {
+      form,
+      onSubmit,
+      onAdd,
+      onRemove,
+    }
+  },
+}
+
 export const SmallSearch = {
   template: `
   <div>
@@ -70,7 +148,7 @@ export const SmallSearch = {
   </div>
   `,
   props: ['db', 'pageData'],
-  emits: ['detail', 'edit', 'delete', 'search'],
+  emits: ['detail', 'edit', 'delete', 'page'],
   components: {
     SmallTableColumn,
   },
@@ -89,11 +167,9 @@ export const SmallSearch = {
     }
 
     const handlePage = (currentPage, pageSize) => {
-      const filter = {}
       const limit = pageSize
       const offset = (currentPage - 1) * pageSize
-      emit('search', {
-        filter,
+      emit('page', {
         limit,
         offset,
       })
@@ -372,8 +448,11 @@ const Nope = () => {}
 
 export const CRUD = {
   template: `
+  <p>
   <el-button type="primary" size="small" @click="dialogVisibleCreate = true">New</el-button>
-  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @search="handleSearch" v-loading="loading" />
+  <el-button type="primary" size="small" @click="dialogVisibleFilter = true">Search</el-button>
+  </p>
+  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @page="handlePage" v-loading="loading" />
   <el-dialog v-model="dialogVisibleEdit">
     <SmallEdit :db="db" :item="item" @update="handleUpdate" />
   </el-dialog>
@@ -383,8 +462,12 @@ export const CRUD = {
   <el-dialog v-model="dialogVisibleCreate">
     <SmallCreate :db="db" @create="handleCreate" />
   </el-dialog>
+  <el-dialog v-model="dialogVisibleFilter">
+    <SmallFilter :db="db" @filter="handleFilter" />
+  </el-dialog>
   `,
   components: {
+    SmallFilter,
     SmallSearch,
     SmallCreate,
     SmallRead,
@@ -417,12 +500,14 @@ export const CRUD = {
     const dialogVisibleCreate = ref(false)
     const dialogVisibleEdit = ref(false)
     const dialogVisibleRead = ref(false)
+    const dialogVisibleFilter = ref(false)
 
-    const search = async (query) => {
+    const query = {}
+
+    const search = async () => {
       loading.value = true
       try {
         const res = await processSearch(query)
-        console.log(res)
         pageData.value = res
       } catch (e) {
         console.log('search error', e)
@@ -477,8 +562,15 @@ export const CRUD = {
       search()
     }
 
-    const handleSearch = async (query) => {
+    const handlePage = async (page) => {
+      query.page = page
+      search()
+    }
+
+    const handleFilter = async (filter) => {
+      query.filter = filter
       search(query)
+      dialogVisibleFilter.value = false
     }
 
     return {
@@ -491,11 +583,13 @@ export const CRUD = {
       handleEdit,
       handleUpdate,
       handleDelete,
-      handleSearch,
+      handlePage,
+      handleFilter,
 
       dialogVisibleCreate,
       dialogVisibleRead,
       dialogVisibleEdit,
+      dialogVisibleFilter,
     }
   },
 }
