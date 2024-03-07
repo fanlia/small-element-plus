@@ -1,6 +1,7 @@
 import { startApp } from './index.js'
 import { CRUDView } from './crud-test.js'
-import { CRUDMongoDBView } from './crud-test-mongodb.js'
+import { CRUDAPIView } from './crud-test-api.js'
+import { CRUDDBView } from './crud-test-db.js'
 
 import { ref } from 'vue'
 
@@ -73,9 +74,14 @@ const routes = [
     component: CRUDView,
   },
   {
+    path: '/api',
+    name: 'API',
+    component: CRUDAPIView,
+  },
+  {
     path: '/database',
     name: 'Database',
-    component: CRUDMongoDBView,
+    component: CRUDDBView,
   },
   {
     path: '/test',

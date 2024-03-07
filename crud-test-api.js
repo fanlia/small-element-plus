@@ -8,9 +8,9 @@ import { ref } from 'vue'
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
 
-export const CRUDMongoDBView = {
+export const CRUDAPIView = {
   template: `
-  <h1>This is an crud/mongodb page</h1>
+  <h1>This is an crud/api page</h1>
   <CRUD
     :db="db"
     :processSearch="processSearch"
