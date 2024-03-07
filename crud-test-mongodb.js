@@ -31,12 +31,14 @@ export const CRUDMongoDBView = {
           type: {
             name: 'ID',
           },
+          sortable: 'custom',
         },
         {
           name: 'name',
           type: {
             name: 'String',
           },
+          sortable: 'custom',
         },
       ]
     }
@@ -128,8 +130,9 @@ export const CRUDMongoDBView = {
 
     const processSearch = async (query) => {
       console.log('search', query)
-      const { filter: domains = [], page = {} } = query
+      const { filter: domains = [], page = {}, sort: sorter } = query
       const { limit, offset } = page
+      const sort = sorter && sorter.name && sorter.order && { [sorter.name]: sorter.order === 'ascending' ? 1 : -1 }
 
       const filter = domain2filter(domains)
       const body = {
@@ -151,6 +154,7 @@ export const CRUDMongoDBView = {
             filter,
             limit,
             offset,
+            sort,
           },
         },
       }

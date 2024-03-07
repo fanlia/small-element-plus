@@ -71,7 +71,11 @@ const routes = [
     path: '/crud',
     name: 'CRUD',
     component: CRUDView,
-    // component: CRUDMongoDBView,
+  },
+  {
+    path: '/mongodb',
+    name: 'Mongodb',
+    component: CRUDMongoDBView,
   },
   {
     path: '/test',

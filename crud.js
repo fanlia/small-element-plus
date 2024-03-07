@@ -38,9 +38,9 @@ const SmallTableColumn = {
         <el-tag>{{scope.row[name]}}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column :prop="name" :label="label || name" v-else />
+    <el-table-column :prop="name" :label="label || name" :sortable="sortable" v-else />
   `,
-  props: ['name', 'type', 'label'],
+  props: ['name', 'type', 'label', 'sortable'],
   components: {
     CodeMirror,
   },
@@ -127,7 +127,7 @@ export const SmallFilter = {
 export const SmallSearch = {
   template: `
   <div>
-  <el-table :data="pageData.data">
+  <el-table :data="pageData.data" @sort-change="handleSort">
     <SmallTableColumn :="field" v-for="field in db.fields" />
     <el-table-column fixed="right" label="Operations" width="200px">
       <template #default="scope">
@@ -148,7 +148,7 @@ export const SmallSearch = {
   </div>
   `,
   props: ['db', 'pageData'],
-  emits: ['detail', 'edit', 'delete', 'page'],
+  emits: ['detail', 'edit', 'delete', 'page', 'sort'],
   components: {
     SmallTableColumn,
   },
@@ -175,11 +175,16 @@ export const SmallSearch = {
       })
     }
 
+    const handleSort = ({ order, prop: name }) => {
+      emit('sort', { order, name })
+    }
+
     return {
       handleDetail,
       handleEdit,
       handleDelete,
       handlePage,
+      handleSort,
     }
   },
 }
@@ -454,7 +459,7 @@ export const CRUD = {
   <el-button type="primary" size="small" @click="dialogVisibleCreate = true">New</el-button>
   <el-button type="primary" size="small" @click="dialogVisibleFilter = true">Search</el-button>
   </p>
-  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @page="handlePage" v-loading="loading" />
+  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @page="handlePage" @sort="handleSort" v-loading="loading" />
   <el-dialog v-model="dialogVisibleEdit">
     <SmallEdit :db="db" :item="item" @update="handleUpdate" />
   </el-dialog>
@@ -569,6 +574,11 @@ export const CRUD = {
       search()
     }
 
+    const handleSort = async (sort) => {
+      query.sort = sort
+      search()
+    }
+
     const handleFilter = async (filter) => {
       query.filter = filter
       search(query)
@@ -586,6 +596,7 @@ export const CRUD = {
       handleUpdate,
       handleDelete,
       handlePage,
+      handleSort,
       handleFilter,
 
       dialogVisibleCreate,
