@@ -3,7 +3,7 @@ import {
   CRUD,
 } from './crud.js'
 
-import { buildDB } from './db.js'
+import { Database } from './db.js'
 
 import { ref } from 'vue'
 
@@ -47,6 +47,34 @@ export const CRUDDBView = {
 
     const url = 'http://localhost:4002/graphql/demo'
 
-    return buildDB(url, db)
+    const database = new Database(url, db)
+
+    const processCreate = async (row) => {
+      console.log('database/create', row)
+      return database.create(row)
+    }
+
+    const processUpdate = async (row) => {
+      console.log('database/update', row)
+      return database.update(row)
+    }
+
+    const processDelete = async (row) => {
+      console.log('database/delete', row)
+      return database.delete(row)
+    }
+
+    const processSearch = async (query) => {
+      console.log('database/search', query)
+      return database.search(query)
+    }
+
+    return {
+      db,
+      processSearch,
+      processCreate,
+      processUpdate,
+      processDelete,
+    }
   },
 }

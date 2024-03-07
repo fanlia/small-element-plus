@@ -2,10 +2,15 @@
 export class Database {
   constructor(url, db) {
     this.url = url
+    this.reset(db)
+  }
+
+  reset (db) {
     this.db = db
     this.name = this.db.name
     this.type = this.name[0].toUpperCase() + this.name.slice(1)
   }
+
   async post (body) {
     const res = await fetch(this.url, {
       method: 'POST',
@@ -39,7 +44,6 @@ export class Database {
   }
 
   async update (row) {
-    console.log('update', row)
     const { _id, ...data } = row
     const body = {
       query: `
@@ -63,7 +67,6 @@ export class Database {
   }
 
   async delete (row) {
-    console.log('delete', row)
     const body = {
       query: `
       mutation (
@@ -101,7 +104,6 @@ export class Database {
   }
 
   async search (query) {
-    console.log('search', query)
     const { filter: domains = [], page = {}, sort: sorter } = query
     const { limit, offset } = page
     const sort = sorter && sorter.name && sorter.order && { [sorter.name]: sorter.order === 'ascending' ? 1 : -1 }
@@ -134,34 +136,5 @@ export class Database {
 
     const res = await this.post(body)
     return res[`${this.name}_find`]
-  }
-}
-
-export const buildDB = (url, db) => {
-
-  const database = new Database(url, db)
-
-  const processCreate = async (row) => {
-    return database.create(row)
-  }
-
-  const processUpdate = async (row) => {
-    return database.update(row)
-  }
-
-  const processDelete = async (row) => {
-    return database.delete(row)
-  }
-
-  const processSearch = async (query) => {
-    return database.search(query)
-  }
-
-  return {
-    db,
-    processSearch,
-    processCreate,
-    processUpdate,
-    processDelete,
   }
 }
