@@ -14,9 +14,9 @@ import { html } from '@codemirror/lang-html';
 export const CRUDView = {
   template: `
   <h1>This is an crud page</h1>
-  <SmallSearch :db="db" :data="data" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" />
-  <SmallEdit :db="db" :item="item" v-if="item" @update="handleUpdate" />
-  <SmallRead :data="itemdata" v-if="item" />
+  <SmallSearch :db="db" :data="data" :total="total" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @search="handleSearch" />
+  <SmallEdit :db="db" :item="item" @update="handleUpdate" />
+  <SmallRead :db="db" :item="item" />
   <SmallCreate :db="db" @create="handleCreate" />
   `,
   components: {
@@ -128,11 +128,9 @@ export const CRUDView = {
       },
     ])
 
-    const item = ref(data.value[0])
+    const total = ref(100)
 
-    const itemdata = computed(() => {
-      return item.value ? db.fields.map(field => ({ ...field, value: item.value[field.name]})) : []
-    })
+    const item = ref(null)
 
     const handleDetail = (row) => {
       console.log('detail', row)
@@ -160,16 +158,22 @@ export const CRUDView = {
       data.value = data.value.filter(d => d._id !== row._id)
     }
 
+    const handleSearch = (query) => {
+      console.log('search', query)
+      total.value = 20
+    }
+
     return {
       db,
       data,
+      total,
       item,
-      itemdata,
       handleDetail,
       handleCreate,
       handleEdit,
       handleUpdate,
       handleDelete,
+      handleSearch,
     }
   },
 }

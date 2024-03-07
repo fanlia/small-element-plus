@@ -48,6 +48,7 @@ const SmallTableColumn = {
 
 export const SmallSearch = {
   template: `
+  <div>
   <el-table :data="data">
     <SmallTableColumn :="field" v-for="field in db.fields" />
     <el-table-column fixed="right" label="Operations" width="200px">
@@ -65,9 +66,11 @@ export const SmallSearch = {
     </el-table-column>
 
   </el-table>
+  <el-pagination :total="total" @change='handlePage' style="margin-top:1em;" v-if="total" />
+  </div>
   `,
-  props: ['db', 'data'],
-  emits: ['detail', 'edit', 'delete'],
+  props: ['db', 'data', 'total'],
+  emits: ['detail', 'edit', 'delete', 'search'],
   components: {
     SmallTableColumn,
   },
@@ -84,10 +87,22 @@ export const SmallSearch = {
       emit('delete', row)
     }
 
+    const handlePage = (currentPage, pageSize) => {
+      const filter = {}
+      const limit = pageSize
+      const offset = (currentPage - 1) * pageSize
+      emit('search', {
+        filter,
+        limit,
+        offset,
+      })
+    }
+
     return {
       handleDetail,
       handleEdit,
       handleDelete,
+      handlePage,
     }
   },
 }
@@ -254,7 +269,7 @@ export const SmallCreate = {
 
 export const SmallEdit = {
   template: `
-  <el-form :model="form" label-width="auto">
+  <el-form :model="form" label-width="auto" v-if="item">
     <SmallFormItem :form="form" :="field" v-for="field in db.fields" />
     <el-form-item>
       <el-button type="primary" @click="onSubmit">Update</el-button>
@@ -319,7 +334,7 @@ const SmallReadItem = {
 
 export const SmallRead = {
   template: `
-  <el-table :data="data" :show-header="false">
+  <el-table :data="itemdata" :show-header="false" v-if="item">
     <el-table-column label="label" width="100px">
       <template #default="scope">
         <el-text tag="b">{{scope.row.label || scope.row.name}}</el-text>
@@ -332,8 +347,22 @@ export const SmallRead = {
     </el-table-column>
   </el-table>
   `,
-  props: ['data'],
+  props: ['db', 'item'],
   components: {
     SmallReadItem,
+  },
+  setup (props) {
+
+    const to_itemdata = (item) => item ? props.db.fields.map(field => ({ ...field, value: item[field.name]})) : []
+
+    const itemdata = ref(to_itemdata(props.item))
+
+    watch(() => props.item, (item) => {
+      itemdata.value = to_itemdata(item)
+    })
+
+    return {
+      itemdata,
+    }
   },
 }
