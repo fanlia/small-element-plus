@@ -126,6 +126,9 @@ const SmallUpload = {
     modelValue: {
       type: String,
     },
+    action: {
+      type: String,
+    },
   },
 
   emits: ['update:modelValue'],
@@ -142,14 +145,11 @@ const SmallUpload = {
         return false
       }
     }
-    const target = "http://localhost:4002"
-    const action = `${target}/api/upload`
     const handleUploadSuccess = (files) => {
-      emit('update:modelValue', `${target}/${files[0].url}`)
+      emit('update:modelValue', files[0].url)
     }
 
     return {
-      action,
       fileList,
       limit,
       beforeUpload,
@@ -177,7 +177,7 @@ const SmallFormItem = {
       </el-scrollbar>
     </el-form-item>
     <el-form-item :label="label || name" v-else-if="type.name === 'Image'">
-      <SmallUpload v-model="form[name]" />
+      <SmallUpload v-model="form[name]" :="type.data" />
     </el-form-item>
     <el-form-item :label="label || name" v-else-if="type.name === 'Int'">
       <el-input-number v-model="form[name]" />

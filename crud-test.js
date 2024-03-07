@@ -62,6 +62,9 @@ export const CRUDView = {
           name: 'image',
           type: {
             name: 'Image',
+            data: {
+              action: "http://localhost:4002/api/upload",
+            },
           },
         },
         {
