@@ -127,7 +127,7 @@ export const SmallFilter = {
 export const SmallSearch = {
   template: `
   <div>
-  <el-table :data="pageData.data" @sort-change="handleSort">
+  <el-table :data="pageData.data" @sort-change="handleSort" row-key="_id">
     <SmallTableColumn :="field" v-for="field in db.fields" />
     <el-table-column fixed="right" label="Operations" width="200px">
       <template #default="scope">
