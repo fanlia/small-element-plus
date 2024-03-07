@@ -97,7 +97,7 @@ export const CRUDView = {
       ],
     }
 
-    const data = [
+    let data = [
       {
         _id: '_id1',
         string: 'just a normal string',
@@ -141,10 +141,23 @@ export const CRUDView = {
       data = data.filter(d => d._id !== row._id)
     }
 
+    const compare = (v1, op, v2) => {
+      switch (op) {
+        case '=': return v1 === v2;
+        case '>': return v1 > v2;
+        case '>=': return v1 >= v2;
+        case '<': return v1 < v2;
+        case '<=': return v1 <= v2;
+        default: return false;
+      }
+    }
+
     const processSearch = (query) => {
       console.log('search', query)
+      const { filter = [], page = {} } = query
+      const found = data.filter(d => filter.every(f => compare(d[f.name], f.operator, f.value)))
       return {
-        data: [...data],
+        data: found,
         count: data.length * 10,
       }
     }
