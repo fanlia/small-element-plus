@@ -19,6 +19,7 @@ export const CRUDDefinitionView = {
     :processCreate="processCreate"
     :processUpdate="processUpdate"
     :processDelete="processDelete"
+    :processRowClick="processRowClick"
   />
   `,
   components: {
@@ -81,12 +82,17 @@ export const CRUDDefinitionView = {
       return database.search(query)
     }
 
+    const processRowClick = async (row) => {
+      console.log('database/row-click', row)
+    }
+
     return {
       db,
       processSearch,
       processCreate,
       processUpdate,
       processDelete,
+      processRowClick,
     }
   },
 }

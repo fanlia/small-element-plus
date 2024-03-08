@@ -128,7 +128,7 @@ export const SmallFilter = {
 export const SmallSearch = {
   template: `
   <div>
-  <el-table :data="pageData.data" @sort-change="handleSort" row-key="_id">
+  <el-table :data="pageData.data" @sort-change="handleSort" @row-click="handleRowClick" row-key="_id">
     <SmallTableColumn :="field" v-for="field in db.fields" />
     <el-table-column fixed="right" label="Operations" width="200px">
       <template #default="scope">
@@ -149,7 +149,7 @@ export const SmallSearch = {
   </div>
   `,
   props: ['db', 'pageData'],
-  emits: ['detail', 'edit', 'delete', 'page', 'sort'],
+  emits: ['detail', 'edit', 'delete', 'page', 'sort', 'row-click'],
   components: {
     SmallTableColumn,
   },
@@ -180,12 +180,17 @@ export const SmallSearch = {
       emit('sort', { order, name })
     }
 
+    const handleRowClick = (row) => {
+      emit('row-click', row)
+    }
+
     return {
       handleDetail,
       handleEdit,
       handleDelete,
       handlePage,
       handleSort,
+      handleRowClick,
     }
   },
 }
@@ -566,7 +571,7 @@ export const CRUD = {
   <el-button type="primary" size="small" @click="dialogVisibleCreate = true">New</el-button>
   <el-button type="primary" size="small" @click="dialogVisibleFilter = true">Search</el-button>
   </p>
-  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @page="handlePage" @sort="handleSort" v-loading="loading" />
+  <SmallSearch :db="db" :pageData="pageData" @detail="handleDetail" @edit="handleEdit" @delete="handleDelete" @page="handlePage" @sort="handleSort" @row-click="handleRowClick" v-loading="loading" />
   <el-dialog v-model="dialogVisibleEdit">
     <SmallEdit :db="db" :item="item" @update="handleUpdate" />
   </el-dialog>
@@ -593,6 +598,7 @@ export const CRUD = {
     'processCreate',
     'processUpdate',
     'processDelete',
+    'processRowClick',
   ],
   setup ({
     db,
@@ -600,6 +606,7 @@ export const CRUD = {
     processCreate = Nope,
     processUpdate = Nope,
     processDelete = Nope,
+    processRowClick = Nope,
   }) {
 
     const loading = ref(true)
@@ -692,6 +699,15 @@ export const CRUD = {
       dialogVisibleFilter.value = false
     }
 
+    const handleRowClick = async (row) => {
+      try {
+        await processRowClick({ ...row })
+      } catch (e) {
+        console.log('row-click error', e)
+        // ignore
+      }
+    }
+
     return {
       loading,
       db,
@@ -705,6 +721,7 @@ export const CRUD = {
       handlePage,
       handleSort,
       handleFilter,
+      handleRowClick,
 
       dialogVisibleCreate,
       dialogVisibleRead,
