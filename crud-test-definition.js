@@ -17,8 +17,11 @@ export const CRUDDefinitionView = {
     :processRowClick="processRowClick"
   />
 
+  <el-divider />
+  <h2>{{dbName}}</h2>
+
   <el-tabs v-model="activeName">
-    <el-tab-pane :label="def.db.name" :name="def.db.name" v-for="def in defs">
+    <el-tab-pane :label="def.db.name" :name="def.db.name" v-for="def in defs" :key="dbName + def.db.name">
       <DBView :db="def.db" :url="def.url" />
     </el-tab-pane>
   </el-tabs>
@@ -29,6 +32,7 @@ export const CRUDDefinitionView = {
   },
   setup () {
 
+    const dbName = ref('')
     const activeName = ref('')
     const defs = ref([])
 
@@ -43,9 +47,11 @@ export const CRUDDefinitionView = {
         db: d,
       }))
       activeName.value = defs.value[0]?.db.name
+      dbName.value = row.name
     }
 
     return {
+      dbName,
       activeName,
       defs,
       definition_url,
