@@ -26,7 +26,7 @@ export const CRUDDBView = {
   },
   setup () {
     const db = {
-      name: 'friend',
+      name: 'document',
       fields: [
         {
           name: '_id',
@@ -42,10 +42,16 @@ export const CRUDDBView = {
           },
           sortable: 'custom',
         },
+        {
+          name: 'db',
+          type: {
+            name: 'Database',
+          },
+        },
       ]
     }
 
-    const url = 'http://localhost:4002/graphql/demo'
+    const url = 'http://localhost:4002/graphql/doc'
 
     const database = new Database(url, db)
 

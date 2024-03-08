@@ -5,6 +5,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import CodeMirror from 'vue-codemirror6'
 import './crud.css'
+import { json } from '@codemirror/lang-json';
 
 const SmallTableColumn = {
   template: `
@@ -205,6 +206,100 @@ const getDefaults = (fields) => {
   }, {})
 }
 
+const SmallDatabase = {
+  template: `
+    <p v-for="(type, type_index) in form[name]" :key="type.key" style="display:flex;width:100%;border:1px solid #eee;padding:1em;">
+      <div>
+        <el-form-item label="type name">
+          <el-input v-model="type.name" />
+        </el-form-item>
+        <p v-for="(field, field_index) in type.fields" :key="field.key" class="small-filter-domain" style="display:flex;">
+          <el-form-item label="field name">
+            <el-input v-model="field.name" />
+          </el-form-item>
+          <el-form-item label="field type">
+            <el-select v-model="field.type.name">
+              <el-option value="String" label="String" />
+              <el-option value="Int" label="Int" />
+              <el-option value="Float" label="Float" />
+              <el-option value="Boolean" label="Boolean" />
+              <el-option value="DateTime" label="DateTime" />
+              <el-option value="ID" label="ID" />
+            </el-select>
+          </el-form-item>
+          <el-button @click="onRemoveField(type_index, field_index)">
+            <el-icon><Minus /></el-icon>
+            <span>Field</span>
+          </el-button>
+        </p>
+        <el-form-item>
+          <el-button @click="onAddField(type_index)">
+            <el-icon><Plus /></el-icon>
+            <span>Field</span>
+          </el-button>
+        </el-form-item>
+      </div>
+      <el-button @click="onRemoveType(type_index)">
+        <el-icon><Minus /></el-icon>
+        <span>Type</span>
+      </el-button>
+    </p>
+    <el-button @click="onAddType">
+      <el-icon><Plus /></el-icon>
+      <span>Type</span>
+    </el-button>
+  `,
+
+  props: ['form', 'name'],
+
+  setup ({ form, name }, { emit }) {
+
+    console.log({form, name})
+    const newField = () => ({
+      key: Date.now(),
+      name: '',
+      type: {
+        name: '',
+      },
+    })
+
+    const newType = () => ({
+      key: Date.now(),
+      name: '',
+      fields: [
+        newField(),
+      ],
+    })
+
+    form[name] = form[name] || [
+      newType(),
+    ]
+
+    const onAddField = (type_index) => {
+      form[name][type_index].fields.push(newField())
+    }
+
+    const onRemoveField = (type_index, field_index) => {
+      form[name][type_index].fields.splice(field_index, 1)
+    }
+
+    const onAddType = () => {
+      form[name].push(newType())
+    }
+
+    const onRemoveType = (type_index) => {
+      form[name].splice(type_index, 1)
+    }
+
+    return {
+      onAddField,
+      onRemoveField,
+      onAddType,
+      onRemoveType,
+    }
+  },
+}
+
 const SmallUpload = {
   template: `
     <el-upload
@@ -293,6 +388,9 @@ const SmallFormItem = {
     <el-form-item :label="label || name" v-else-if="type.name === 'Image'">
       <SmallUpload v-model="form[name]" :="type.data" />
     </el-form-item>
+    <el-form-item :label="label || name" v-else-if="type.name === 'Database'">
+      <SmallDatabase :form="form" :name="name" />
+    </el-form-item>
     <el-form-item :label="label || name" v-else-if="type.name === 'Int'">
       <el-input-number v-model="form[name]" />
     </el-form-item>
@@ -315,6 +413,7 @@ const SmallFormItem = {
   components: {
     QuillEditor,
     SmallUpload,
+    SmallDatabase,
     CodeMirror,
   },
 }
@@ -408,12 +507,22 @@ const SmallReadItem = {
     <div v-else-if="type.name === 'Enum'">
         <el-tag>{{value}}</el-tag>
     </div>
+    <div v-else-if="typeof value === 'object'">
+      <el-scrollbar max-height="100px" style="width:100%">
+        <CodeMirror :modelValue="JSON.stringify(value, null, 2)" :lang="jsonLang" :basic="true" :readonly="true" />
+      </el-scrollbar>
+    </div>
     <div v-else>{{value}}</div>
   `,
   props: ['value', 'name', 'type', 'label'],
   components: {
     CodeMirror,
   },
+  setup () {
+    return {
+      jsonLang: json(),
+    }
+  }
 }
 
 export const SmallRead = {
