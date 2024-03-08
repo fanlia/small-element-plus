@@ -1,7 +1,5 @@
 
-import {
-  CRUD,
-} from './crud.js'
+import { DBView, DefinitionView } from './crud-db.js'
 
 import { Database, types2gql } from './db.js'
 
@@ -10,88 +8,47 @@ import { ref } from 'vue'
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
 
+
 export const CRUDDefinitionView = {
   template: `
   <h1>This is an crud/definition page</h1>
-  <CRUD
-    :db="db"
-    :processSearch="processSearch"
-    :processCreate="processCreate"
-    :processUpdate="processUpdate"
-    :processDelete="processDelete"
+  <DefinitionView
+    :url="definition_url"
     :processRowClick="processRowClick"
   />
+
+  <el-tabs v-model="activeName">
+    <el-tab-pane :label="def.db.name" :name="def.db.name" v-for="def in defs">
+      <DBView :db="def.db" :url="def.url" />
+    </el-tab-pane>
+  </el-tabs>
   `,
   components: {
-    CRUD,
+    DBView,
+    DefinitionView,
   },
   setup () {
-    const db = {
-      name: 'definition',
-      fields: [
-        {
-          name: '_id',
-          type: {
-            name: 'ID',
-          },
-        },
-        {
-          name: 'name',
-          type: {
-            name: 'String',
-          },
-        },
-        {
-          name: 'gql',
-          type: {
-            name: 'String',
-          },
-        },
-        {
-          name: 'types',
-          type: {
-            name: 'Database',
-          },
-        },
-      ]
-    }
 
-    const url = 'http://localhost:4002/graphql/definition'
+    const activeName = ref('')
+    const defs = ref([])
 
-    const database = new Database(url, db)
+    const baseUrl = 'http://localhost:4002/graphql'
 
-    const processCreate = async (row) => {
-      console.log('database/create', row)
-      row.gql = types2gql(row.types)
-      return database.create(row)
-    }
-
-    const processUpdate = async (row) => {
-      console.log('database/update', row)
-      row.gql = types2gql(row.types)
-      return database.update(row)
-    }
-
-    const processDelete = async (row) => {
-      console.log('database/delete', row)
-      return database.delete(row)
-    }
-
-    const processSearch = async (query) => {
-      console.log('database/search', query)
-      return database.search(query)
-    }
+    const definition_url = `${baseUrl}/definition`
 
     const processRowClick = async (row) => {
-      console.log('database/row-click', row)
+      const url = `${baseUrl}/${row.name}`
+      defs.value = row.types.map(d => ({
+        url,
+        db: d,
+      }))
+      activeName.value = defs.value[0]?.db.name
     }
 
     return {
-      db,
-      processSearch,
-      processCreate,
-      processUpdate,
-      processDelete,
+      activeName,
+      defs,
+      definition_url,
       processRowClick,
     }
   },

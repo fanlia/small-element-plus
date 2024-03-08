@@ -1,4 +1,3 @@
-
 export class Database {
   constructor(url, db) {
     this.url = url
@@ -7,8 +6,8 @@ export class Database {
 
   reset (db) {
     this.db = db
-    this.name = this.db.name
-    this.type = this.name[0].toUpperCase() + this.name.slice(1)
+    this.type = this.db.name
+    this.name = this.type[0].toLowerCase() + this.type.slice(1)
   }
 
   async post (body) {
@@ -163,3 +162,4 @@ ${fields_string}
 
   }).join('')
 }
+
