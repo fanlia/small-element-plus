@@ -271,9 +271,7 @@ const SmallDatabase = {
       ],
     })
 
-    form[name] = form[name] || [
-      newType(),
-    ]
+    form[name] = form[name] || []
 
     const onAddField = (type_index) => {
       form[name][type_index].fields.push(newField())

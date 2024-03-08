@@ -148,3 +148,18 @@ export class Database {
     return res[`${this.name}_find`]
   }
 }
+
+export const types2gql = (types = []) => {
+  return types.map(({ name, fields = [] }) => {
+
+    const fields_string = fields.map(field => {
+return `  ${field.name}: ${field.type.name}\n`
+    }).join('')
+return `
+type ${name} {
+${fields_string}
+}
+`
+
+  }).join('')
+}

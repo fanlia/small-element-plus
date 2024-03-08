@@ -1,6 +1,7 @@
 import { startApp } from './index.js'
 import { CRUDView } from './crud-test.js'
 import { CRUDDBView } from './crud-test-db.js'
+import { CRUDDefinitionView } from './crud-test-definition.js'
 
 import { ref } from 'vue'
 
@@ -76,6 +77,11 @@ const routes = [
     path: '/database',
     name: 'Database',
     component: CRUDDBView,
+  },
+  {
+    path: '/definition',
+    name: 'Definitioin',
+    component: CRUDDefinitionView,
   },
   {
     path: '/test',
