@@ -150,6 +150,10 @@ export class Database {
 
 export const types2gql = (types = []) => {
   return types.map(({ name, fields = [] }) => {
+    const hasId = fields.some(d => d.name === '_id' && d.type.name === 'ID')
+    if (!hasId) {
+      throw new Error('field _id: ID required')
+    }
 
     const fields_string = fields.map(field => {
 return `  ${field.name}: ${field.type.name}\n`
