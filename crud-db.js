@@ -96,12 +96,16 @@ export const DefinitionView = {
     const database = new Database(url, db)
 
     const processCreate = async (row) => {
-      row.gql = types2gql(row.types)
+      if (row.types.length > 0) {
+        row.gql = types2gql(row.types)
+      }
       return database.create(row)
     }
 
     const processUpdate = async (row) => {
-      row.gql = types2gql(row.types)
+      if (row.types.length > 0) {
+        row.gql = types2gql(row.types)
+      }
       return database.update(row)
     }
 

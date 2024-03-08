@@ -107,7 +107,6 @@ export const SmallFilter = {
 
     const onRemove = (domain) => {
       const index = form.domains.findIndex(d => d.key === domain.key)
-      console.log({index})
       form.domains.splice(index, 1)
     }
 
@@ -259,7 +258,6 @@ const SmallDatabase = {
 
   setup ({ form, name }, { emit }) {
 
-    console.log({form, name})
     const newField = () => ({
       key: Date.now(),
       name: '',
