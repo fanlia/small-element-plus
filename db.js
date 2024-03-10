@@ -6,8 +6,8 @@ export class Database {
 
   reset (db) {
     this.db = db
-    this.type = this.db.name
-    this.name = this.type[0].toLowerCase() + this.type.slice(1)
+    this.type = upperFirstChar(this.db.name)
+    this.name = lowerFirstChar(this.type)
   }
 
   async post (body) {
@@ -153,6 +153,7 @@ export const types2gql = (types = []) => {
     if (!name) {
       throw new Error('type name required')
     }
+    name = upperFirstChar(name)
     const hasId = fields.some(d => d.name === '_id' && d.type.name === 'ID')
     if (!hasId) {
       throw new Error('field _id: ID required')
@@ -170,3 +171,6 @@ ${fields_string}
   }).join('')
 }
 
+const lowerFirstChar = (name) => name[0].toLowerCase() + name.slice(1)
+
+const upperFirstChar = (name) => name[0].toUpperCase() + name.slice(1)

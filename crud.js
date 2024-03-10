@@ -1,5 +1,6 @@
 
 import { ref, reactive, watch, toRaw, onMounted } from 'vue'
+import { ElMessageBox } from 'element-plus'
 
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -131,15 +132,11 @@ export const SmallSearch = {
     <SmallTableColumn :="field" v-for="field in db.fields" />
     <el-table-column fixed="right" label="Operations" width="200px">
       <template #default="scope">
-        <el-button link type="primary" size="small" @click="handleDetail(scope.row)"
+        <el-button link type="primary" size="small" @click.stop="handleDetail(scope.row)"
           >Detail</el-button
         >
-        <el-button link type="primary" size="small" @click="handleEdit(scope.row)">Edit</el-button>
-        <el-popconfirm title="Are you sure to delete this?" @confirm="handleDelete(scope.row)">
-          <template #reference>
-            <el-button link type="danger" size="small">Delete</el-button>
-          </template>
-        </el-popconfirm>
+        <el-button link type="primary" size="small" @click.stop="handleEdit(scope.row)">Edit</el-button>
+        <el-button link type="danger" size="small" @click.stop="handleDelete">Delete</el-button>
       </template>
     </el-table-column>
 
@@ -163,7 +160,21 @@ export const SmallSearch = {
     }
 
     const handleDelete = (row) => {
-      emit('delete', row)
+      ElMessageBox.confirm(
+        'Are you sure to delete this?',
+        'Warning',
+        {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning',
+        }
+      )
+      .then(() => {
+        emit('delete', row)
+      })
+      .catch(() => {
+
+      })
     }
 
     const handlePage = (currentPage, pageSize) => {
@@ -268,9 +279,22 @@ const SmallDatabase = {
 
     const newType = () => ({
       key: Date.now(),
-      name: '',
+      name: 'Demo',
       fields: [
-        newField(),
+        {
+          key: Date.now(),
+          name: '_id',
+          type: {
+            name: 'ID',
+          },
+        },
+        {
+          key: Date.now(),
+          name: 'name',
+          type: {
+            name: 'String',
+          },
+        },
       ],
     })
 
