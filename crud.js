@@ -136,7 +136,7 @@ export const SmallSearch = {
           >Detail</el-button
         >
         <el-button link type="primary" size="small" @click.stop="handleEdit(scope.row)">Edit</el-button>
-        <el-button link type="danger" size="small" @click.stop="handleDelete">Delete</el-button>
+        <el-button link type="danger" size="small" @click.stop="handleDelete(scope.row)">Delete</el-button>
       </template>
     </el-table-column>
 
