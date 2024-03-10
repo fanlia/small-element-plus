@@ -2,6 +2,7 @@ import { startApp } from './index.js'
 import { CRUDView } from './crud-test.js'
 import { CRUDDBView } from './crud-test-db.js'
 import { CRUDDefinitionView } from './crud-test-definition.js'
+import { AIView } from './ai.js'
 
 import { ref } from 'vue'
 
@@ -82,6 +83,11 @@ const routes = [
     path: '/definition',
     name: 'Definitioin',
     component: CRUDDefinitionView,
+  },
+  {
+    path: '/ai',
+    name: 'AI',
+    component: AIView,
   },
   {
     path: '/test',

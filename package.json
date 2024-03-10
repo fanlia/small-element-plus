@@ -22,5 +22,8 @@
     "vue": "^3.4.21",
     "vue-codemirror6": "^1.2.5",
     "vue-router": "^4.3.0"
+  },
+  "dependencies": {
+    "xf-spark-api": "^1.0.0"
   }
 }
