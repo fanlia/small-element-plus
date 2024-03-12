@@ -116,7 +116,7 @@ export const AIView = {
       await spark.value.run({
         question,
         onanswer: (result) => {
-          answer += result
+          answer += result.content
           messages.value.splice(index, 1, {
             type: 'answer',
             value: answer,

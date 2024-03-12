@@ -4,6 +4,8 @@ import { CRUDDBView } from './crud-test-db.js'
 import { CRUDDefinitionView } from './crud-test-definition.js'
 import { AIView } from './ai.js'
 
+import './rxjs-test.js'
+
 import { ref } from 'vue'
 
 const Counter = {
